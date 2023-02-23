@@ -5,7 +5,79 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script>
+    const handleResponse = async (response) => {
+      // Based on the bodyParseExample
+      // Set up a reference to the content section
+      const content = document.querySelector('#content');
 
+      //Based on the status code, display something
+      switch(response.status) {
+        case 200: //success
+          content.innerHTML = `<b>Success</b>`;
+          break;
+        case 201: //created
+          content.innerHTML = '<b>Created</b>';
+          break;
+        case 204: //updated (no response back from server)
+          content.innerHTML = '<b>Updated (No Content)</b>';
+          return;
+        case 400: //bad request
+          content.innerHTML = `<b>Bad Request</b>`;
+          break;
+        default: //any other status code
+          content.innerHTML = `Error code not implemented by client.`;
+          break;
+      }
+
+      // Get the JSON from the response and display it (may be a message and/or the list of users)
+      let obj = await response.json();
+      content.innerHTML += `<p>${JSON.stringify(obj)}</p>`;
+    };
+
+    const requestUpdate = async (url, method) => {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+    }
+
+    const requestPost = async (url, method, data) => {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Accept': 'application/json'
+        },
+        body: data
+      });
+    }
+
+    const init = () => {
+      // Set up the add user button
+      document.querySelector("#nameForm").addEventListener('submit', () => {
+        // Save the data from the user
+        const name = document.querySelector("#nameField").value;
+        const age = document.querySelector("#ageField").value;
+
+        // Create the body
+        const data = `name=${name}&age=${age}`;
+
+        // Send the request
+        requestPost("/addUser", "post", data);
+      });
+
+      // Set up the get user button
+      document.querySelector("#userForm").addEventListener('submit', () => {
+        const url = document.querySelector("#urlField").value;
+        const method = document.querySelector("#methodSelect").value;
+        console.log(url, method);
+        requestUpdate(url, method);
+      })
+    }
+
+    // Hoop up init so it happens when the window is loaded
+    window.onload = init;
   </script>
 </head>
 <body>
