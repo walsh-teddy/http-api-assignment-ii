@@ -15,9 +15,8 @@ const parseBody = (request, response, callback) => {
   const body = [];
 
   // Set up error handling
-  request.on('error', (err) => {
+  request.on('error', () => {
     // Note the error and send back the response
-    console.dir(err);
     response.statusCode = 400;
     response.end();
   });
@@ -60,7 +59,6 @@ const urlStruct = {
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url).pathname;
   const { method } = request;
-  console.log(method, parsedUrl);
 
   // Check if the user entered either POST, GET, or HEAD
   // Post only has 1 possible url
@@ -81,6 +79,4 @@ const onRequest = (request, response) => {
 };
 
 // Create the server
-http.createServer(onRequest).listen(port, () => {
-  console.log(`Listening on 127.0.0.1:${port}`);
-});
+http.createServer(onRequest).listen(port, () => {});
