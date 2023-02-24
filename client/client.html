@@ -24,14 +24,27 @@
         case 400: //bad request
           content.innerHTML = `<b>Bad Request</b>`;
           break;
+        case 404: // Missing
+          content.innerHTML = `<b>Not Found</b>`;
+          break;
         default: //any other status code
           content.innerHTML = `Error code not implemented by client.`;
           break;
       }
 
-      // Get the JSON from the response and display it (may be a message and/or the list of users)
-      let obj = await response.json();
-      content.innerHTML += `<p>${JSON.stringify(obj)}</p>`;
+      // Print the text if there is any
+      const text = await response.text();
+      if (text) {
+        // Parse it into json
+        jsonObj = JSON.parse(text);
+        // Check if there was a message
+        if (jsonObj.message) { // There was a message
+          content.innerHTML += `<p>Message: ${JSON.stringify(jsonObj.message)}</p>`;
+          }
+          else { // There was not a message (it was most likely returning the list of users)
+            content.innerHTML += `<p>${JSON.stringify(jsonObj)}</p>`;
+          }
+      }
     };
 
     const requestUpdate = async (url, method) => {
@@ -41,6 +54,7 @@
           'Accept': 'application/json'
         }
       });
+      handleResponse(response);
     }
 
     const requestPost = async (url, method, data) => {
@@ -51,11 +65,15 @@
         },
         body: data
       });
+      handleResponse(response);
     }
 
     const init = () => {
       // Set up the add user button
-      document.querySelector("#nameForm").addEventListener('submit', () => {
+      document.querySelector("#nameForm").addEventListener('submit', (e) => {
+        // Stop it from loading in another page
+        e.preventDefault();
+
         // Save the data from the user
         const name = document.querySelector("#nameField").value;
         const age = document.querySelector("#ageField").value;
@@ -68,10 +86,15 @@
       });
 
       // Set up the get user button
-      document.querySelector("#userForm").addEventListener('submit', () => {
+      document.querySelector("#userForm").addEventListener('submit', (e) => {
+        // Stop it from loading another page
+        e.preventDefault();
+
+        // Save data from the user
         const url = document.querySelector("#urlField").value;
         const method = document.querySelector("#methodSelect").value;
-        console.log(url, method);
+
+        // Send the request
         requestUpdate(url, method);
       })
     }

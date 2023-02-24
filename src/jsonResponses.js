@@ -44,7 +44,7 @@ const addUsers = (request, response, body) => {
       users[body.name] = { age: body.age };
       respondJSONMeta(request, response, 201);
     }
-  } else { // They don't exist
+  } else { // Missing parameters
     // Send back an error message
     const responseJSON = { message: 'Name and age are both required', id: 'addUserMissingParams' };
     respondJSON(request, response, 404, responseJSON);

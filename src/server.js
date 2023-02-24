@@ -45,13 +45,14 @@ const urlStruct = {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getCSS, // Alows the page to actually use the css (it wasn't before)
     '/getUsers': jsonHandler.getUsers,
-    '/addUsers': jsonHandler.addUsers,
     notFound: jsonHandler.notFound,
   },
   HEAD: {
     '/getUsers': jsonHandler.getUsersMeta,
-    '/addUsers': jsonHandler.addUsersMeta,
     notFound: jsonHandler.notFoundMeta,
+  },
+  POST: {
+    '/addUser': jsonHandler.addUsers,
   },
 };
 
@@ -61,10 +62,9 @@ const onRequest = (request, response) => {
   const { method } = request;
 
   // Check if the user entered either POST, GET, or HEAD
-  // Post only has 1 possible url
-  if (method === 'POST' && parsedUrl === '/addUser') {
+  if (method === 'POST') {
     // There is only 1 possible url with POST
-    parseBody(request, response, jsonHandler.addUsers);
+    parseBody(request, response, urlStruct[method][parsedUrl]);
   } else if (urlStruct[method]) { // It is using GET or HEAD
     // Check if its URL is found
     if (urlStruct[method][parsedUrl]) { // It is found
